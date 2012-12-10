@@ -1,20 +1,29 @@
 #ifndef TARANTOOLBOX_H_INCLUDED
 #define TARANTOOLBOX_H_INCLUDED
 
-#include <iproto.h>
+#ifndef ERR_CODES_ENUM
+    #define ERR_CODES_ENUM tarantoolbox_error
+    #include <iprotocluster.h>
+    #undef ERR_CODES_ENUM
+#else
+    #include <iprotocluster.h>
+#endif
 
-#define TARANTOOLBOX_ERR_CODE_FLAG (0x10)
+#define TARANTOOLBOX_ERR_CODE_FLAG ((0x40 << 16) | IPROTO_ERR_CODE_FLAG)
 #define TARANTOOLBOX_ERROR_CODES(_) \
-    _(ERR_CODE_INVALID_REQUEST,   ((0x01) << 16) | (TARANTOOLBOX_ERR_CODE_FLAG | 0x02), "invalid request") \
-    _(ERR_CODE_INVALID_RESPONSE,  ((0x02) << 16) | (TARANTOOLBOX_ERR_CODE_FLAG | 0x02), "invalid response")
-LIBIPROTOENUM(tarantoolbox_error_codes, TARANTOOLBOX_ERROR_CODES);
-typedef uint32_t tarantoolbox_error_t;
+    _(ERR_CODE_INVALID_REQUEST,   (0x01 << 16) | (TARANTOOLBOX_ERR_CODE_FLAG | FATAL_ERR_CODE_FLAG), "invalid request") \
+    _(ERR_CODE_INVALID_RESPONSE,  (0x02 << 16) | (TARANTOOLBOX_ERR_CODE_FLAG | FATAL_ERR_CODE_FLAG), "invalid response")
+#define TARANTOOLBOX_ALL_ERROR_CODES(x) TARANTOOLBOX_ERROR_CODES(x) IPROTO_ALL_ERROR_CODES(x)
+#ifndef ERR_CODES_ENUM
+typedef enum tarantoolbox_error ENUM_INITIALIZER(TARANTOOLBOX_ALL_ERROR_CODES) tarantoolbox_error_t;
+#else
+typedef enum ERR_CODES_ENUM tarantoolbox_error_t;
+#endif
 #define tarantoolbox_error_string(e) iproto_error_string(e)
 
 #define TARANTOOLBOX_LOGMASK(_) \
     _(LOG_TUPLE, (0x000001 << 8))
-LIBIPROTOENUM(tarantoolbox_logmask, TARANTOOLBOX_LOGMASK);
-typedef enum tarantoolbox_logmask tarantoolbox_logmask_t;
+typedef enum tarantoolbox_logmask ENUM_INITIALIZER(TARANTOOLBOX_LOGMASK) tarantoolbox_logmask_t;
 
 #define TARANTOOLBOX_MESSAGE_TYPE(_) \
     _(NOP, 1) \
@@ -26,9 +35,7 @@ typedef enum tarantoolbox_logmask tarantoolbox_logmask_t;
     _(EXEC_LUA, 22) \
     _(PAXOS_LEADER, 90) \
     _(SELECT_KEYS, 99)
-
-LIBIPROTOENUM(tarantoolbox_message_type, TARANTOOLBOX_MESSAGE_TYPE);
-typedef enum tarantoolbox_message_type tarantoolbox_message_type_t;
+typedef enum tarantoolbox_message_type ENUM_INITIALIZER(TARANTOOLBOX_MESSAGE_TYPE) tarantoolbox_message_type_t;
 
 typedef enum {
     WANT_RESULT    = 0x01,
