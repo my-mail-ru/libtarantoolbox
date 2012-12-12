@@ -9,6 +9,13 @@ typedef struct __attribute__ ((__packed__)) {
     uint8_t data[];
 } tarantoolbox_message_response_pack_t;
 
+static bool tarantoolbox_message_soft_retry_callback(iproto_message_t *message) {
+    size_t size;
+    bool replica;
+    void *data = iproto_message_response(message, &size, &replica);
+    return size >= sizeof(uint32_t) && ERR_CODE_IS_TEMPORARY(*(uint32_t *)data);
+}
+
 tarantoolbox_message_t *tarantoolbox_message_init(tarantoolbox_message_type_t type, void *data, size_t size) {
     tarantoolbox_message_t *message = malloc(sizeof(*message));
     memset(message, 0, sizeof(*message));
@@ -16,10 +23,13 @@ tarantoolbox_message_t *tarantoolbox_message_init(tarantoolbox_message_type_t ty
     message->response.error = ERR_CODE_REQUEST_IN_PROGRESS;
     message->message = iproto_message_init(type, data, size);
     message->data = data;
+    iproto_message_opts_t *opts = iproto_message_options(message->message);
     if (type != SELECT) {
-        iproto_message_opts_t *opts = iproto_message_options(message->message);
         opts->from = FROM_MASTER;
+        opts->timeout.tv_sec = 23;
+        opts->timeout.tv_usec = 0;
     }
+    opts->soft_retry_callback = tarantoolbox_message_soft_retry_callback;
     return message;
 }
 
