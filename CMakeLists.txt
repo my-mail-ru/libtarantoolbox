@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 
 project(tarantoolbox)
 
-set(tarantoolbox_cflags "-std=gnu99 -Wall -Werror -g")
+set(tarantoolbox_cflags "-std=gnu99 -Wall -Werror -ggdb3")
 
 set(tarantoolbox_sources tarantoolbox.c
 tarantoolbox_message.c tarantoolbox_select.c
