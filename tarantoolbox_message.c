@@ -24,10 +24,20 @@ tarantoolbox_message_t *tarantoolbox_message_init(tarantoolbox_message_type_t ty
     message->message = iproto_message_init(type, data, size);
     message->data = data;
     iproto_message_opts_t *opts = iproto_message_options(message->message);
-    if (type != SELECT) {
+    if (type == SELECT) {
+        opts->from = FROM_MASTER_REPLICA;
+        opts->retry &= ~RETRY_SAFE;
+        opts->timeout.tv_sec = 0;
+        opts->timeout.tv_usec = 200000;
+    } else {
         opts->from = FROM_MASTER;
         opts->timeout.tv_sec = 23;
         opts->timeout.tv_usec = 0;
+        opts->retry |= RETRY_SAFE;
+        opts->soft_retry_delay_min.tv_sec = 0;
+        opts->soft_retry_delay_min.tv_usec = 500000;
+        opts->soft_retry_delay_max.tv_sec = 1;
+        opts->soft_retry_delay_max.tv_usec = 500000;
     }
     opts->soft_retry_callback = tarantoolbox_message_soft_retry_callback;
     return message;

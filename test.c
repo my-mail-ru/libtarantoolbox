@@ -8,12 +8,12 @@
 #define SELECT_CHUNK 1
 
 int main(int argc, char *argv[]) {
-    iproto_t *iproto = iproto_init();
+    iproto_cluster_t *cluster = iproto_cluster_init();
     iproto_shard_t *shard = iproto_shard_init();
     iproto_server_t *server = iproto_server_init("188.93.61.208", 30000);
     iproto_shard_add_servers(shard, false, &server, 1);
     iproto_server_free(server);
-    iproto_add_shard(iproto, shard);
+    iproto_cluster_add_shard(cluster, shard);
 
     uint32_t id = 1000011658;
     for (int i = 0; i < COUNT; i++) {
@@ -30,7 +30,7 @@ int main(int argc, char *argv[]) {
             imessages[j] = tarantoolbox_message_get_iproto_message(messages[j]);
             tarantoolbox_tuples_free(keys);
         }
-        iproto_bulk(iproto, imessages, CHUNK, NULL);
+        iproto_cluster_bulk(cluster, imessages, CHUNK, NULL);
         for (int j = 0; j < CHUNK; j++) {
             tarantoolbox_error_t error = tarantoolbox_message_error(messages[j], NULL);
             assert(error == ERR_CODE_OK);
@@ -46,5 +46,5 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    iproto_free(iproto);
+    iproto_cluster_free(cluster);
 }
