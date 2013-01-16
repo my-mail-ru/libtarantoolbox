@@ -78,11 +78,13 @@ size_t tarantoolbox_field_pack(tarantoolbox_field_t *field, void *buf) {
 }
 
 size_t tarantoolbox_field_unpack(tarantoolbox_field_t *field, void *data, size_t maxsize) {
-    size_t size = tarantoolbox_varint_uint32_unpack(data, &field->size);
+    uint32_t field_size;
+    size_t size = tarantoolbox_varint_uint32_unpack(data, &field_size);
     if (size == 0) {
         tarantoolbox_log(LOG_ERROR, "invalid field size BER");
         return 0;
     }
+    field->size = (size_t)field_size;
     if (field->size > maxsize - size) {
         tarantoolbox_log(LOG_ERROR, "field size is too large: %d > %d", field->size, maxsize - size);
         return 0;

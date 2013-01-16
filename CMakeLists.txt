@@ -18,5 +18,8 @@ add_executable(tarantoolboxtest test.c)
 target_link_libraries(tarantoolboxtest tarantoolbox)
 set_target_properties(tarantoolboxtest PROPERTIES COMPILE_FLAGS "${tarantoolbox_cflags}")
 
-install(TARGETS tarantoolbox LIBRARY DESTINATION lib ARCHIVE DESTINATION lib)
+install(TARGETS tarantoolbox
+    LIBRARY DESTINATION ${LIB_INSTALL_DIR}
+    ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
+)
 install(FILES tarantoolbox.h DESTINATION include)

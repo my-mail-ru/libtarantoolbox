@@ -53,7 +53,7 @@ static void _tarantoolbox_tuple_log(tarantoolbox_tuple_t *tuple, tarantoolbox_lo
     va_end(ap);
     fprintf(stderr, ": [%u]", tuple->cardinality);
     for (uint32_t i = 0; i < tuple->cardinality; i++) {
-        fprintf(stderr, " [%u]{", tuple->fields[i].size);
+        fprintf(stderr, " [%zu]{", tuple->fields[i].size);
         for (int j = 0; j < tuple->fields[i].size; j++) {
             fprintf(stderr, " %02x", ((unsigned char *)tuple->fields[i].data)[j]);
         }
