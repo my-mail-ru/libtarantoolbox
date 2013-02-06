@@ -26,6 +26,7 @@ tarantoolbox_tuple_t *tarantoolbox_tuple_init(uint32_t cardinality) {
 }
 
 void tarantoolbox_tuple_free(tarantoolbox_tuple_t *tuple) {
+    if (!tuple) return;
     free(tuple->fields);
     free(tuple);
 }

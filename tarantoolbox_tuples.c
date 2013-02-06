@@ -22,6 +22,7 @@ tarantoolbox_tuples_t *tarantoolbox_tuples_init(uint32_t count, bool has_tuples)
 }
 
 void tarantoolbox_tuples_free(tarantoolbox_tuples_t *tuples) {
+    if (!tuples) return;
     if (tuples->tuples) {
         for (uint32_t i = 0; i < tuples->count; i++)
             tarantoolbox_tuple_free(tuples->tuples[i]);
