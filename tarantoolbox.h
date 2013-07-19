@@ -22,9 +22,10 @@ typedef enum ERR_CODES_ENUM tarantoolbox_error_t;
 #endif
 #define tarantoolbox_error_string(e) iproto_error_string(e)
 
-#define TARANTOOLBOX_LOGMASK(_) \
+#define TARANTOOLBOX_LOGTYPE(_) \
     _(LOG_TUPLE, (0x000001 << 8))
-typedef enum tarantoolbox_logmask ENUM_INITIALIZER(TARANTOOLBOX_LOGMASK) tarantoolbox_logmask_t;
+#define TARANTOOLBOX_LOGMASK(_) IPROTO_LOGLEVEL(_) TARANTOOLBOX_LOGTYPE(_)
+typedef enum tarantoolbox_logmask ENUM_INITIALIZER(TARANTOOLBOX_LOGTYPE) tarantoolbox_logmask_t;
 
 #define TARANTOOLBOX_MESSAGE_TYPE(_) \
     _(NOP, 1) \
