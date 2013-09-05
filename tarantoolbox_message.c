@@ -24,16 +24,21 @@ tarantoolbox_message_t *tarantoolbox_message_init(tarantoolbox_message_type_t ty
     message->message = iproto_message_init(type, data, size);
     message->data = data;
     iproto_message_opts_t *opts = iproto_message_options(message->message);
-    if (type == SELECT) {
-        opts->from = FROM_MASTER_REPLICA;
+    opts->from = type == SELECT || type == EXEC_LUA ? FROM_MASTER_REPLICA : FROM_MASTER;
+    if (type == UPDATE_FIELDS) {
+        opts->retry |= RETRY_SAFE;
+    } else {
         opts->retry &= ~RETRY_SAFE;
+    }
+    if (type == SELECT) {
         opts->timeout.tv_sec = 0;
         opts->timeout.tv_usec = 200000;
+    } else if (type == EXEC_LUA) {
+        opts->timeout.tv_sec = 0;
+        opts->timeout.tv_usec = 500000;
     } else {
-        opts->from = FROM_MASTER;
         opts->timeout.tv_sec = 23;
         opts->timeout.tv_usec = 0;
-        opts->retry |= RETRY_SAFE;
         opts->soft_retry_delay_min.tv_sec = 0;
         opts->soft_retry_delay_min.tv_usec = 500000;
         opts->soft_retry_delay_max.tv_sec = 1;

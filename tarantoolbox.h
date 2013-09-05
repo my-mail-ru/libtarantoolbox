@@ -67,6 +67,7 @@ tarantoolbox_message_t *tarantoolbox_select_init(uint32_t namespace, uint32_t in
 tarantoolbox_message_t *tarantoolbox_insert_init(uint32_t namespace, tarantoolbox_tuple_t *tuple, uint32_t flags);
 tarantoolbox_message_t *tarantoolbox_update_init(uint32_t namespace, tarantoolbox_tuple_t *key, tarantoolbox_update_ops_t *ops, uint32_t flags);
 tarantoolbox_message_t *tarantoolbox_delete_init(uint32_t namespace, tarantoolbox_tuple_t *key, uint32_t flags);
+tarantoolbox_message_t *tarantoolbox_call_init(const char *function, tarantoolbox_tuple_t *tuple, uint32_t flags);
 void tarantoolbox_message_free(tarantoolbox_message_t *message);
 iproto_message_t *tarantoolbox_message_get_iproto_message(tarantoolbox_message_t *message);
 tarantoolbox_message_type_t tarantoolbox_message_type(tarantoolbox_message_t *message);

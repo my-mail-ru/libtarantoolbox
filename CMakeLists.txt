@@ -8,7 +8,7 @@ set(tarantoolbox_sources tarantoolbox.c
 tarantoolbox_message.c tarantoolbox_select.c
 tarantoolbox_insert.c tarantoolbox_update.c tarantoolbox_delete.c
 tarantoolbox_tuples.c tarantoolbox_tuple.c tarantoolbox_field.c
-tarantoolbox_util.c)
+tarantoolbox_call.c tarantoolbox_util.c)
 
 add_library(tarantoolbox ${tarantoolbox_sources})
 target_link_libraries(tarantoolbox iprotocluster)
