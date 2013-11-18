@@ -51,7 +51,9 @@ typedef enum {
     UPDATE_OP_AND = 2,
     UPDATE_OP_XOR = 3,
     UPDATE_OP_OR = 4,
-    UPDATE_OP_SPLICE = 5
+    UPDATE_OP_SPLICE = 5,
+    UPDATE_OP_DELETE = 6,
+    UPDATE_OP_INSERT = 7
 } tarantoolbox_update_op_type_t;
 
 typedef struct tarantoolbox_tuple tarantoolbox_tuple_t;
