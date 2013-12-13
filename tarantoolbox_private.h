@@ -14,6 +14,7 @@ struct tarantoolbox_message {
         bool replica;
         uint32_t error;
         char *error_string;
+        bool error_string_allocated;
         tarantoolbox_tuples_t *tuples;
     } response;
 };

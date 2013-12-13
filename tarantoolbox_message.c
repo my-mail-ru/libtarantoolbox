@@ -52,6 +52,8 @@ void tarantoolbox_message_free(tarantoolbox_message_t *message) {
     iproto_message_free(message->message);
     if (message->response.tuples)
         tarantoolbox_tuples_free(message->response.tuples);
+    if (message->response.error_string_allocated)
+        free(message->response.error_string);
     free(message->data);
     free(message);
 }
@@ -101,7 +103,14 @@ void tarantoolbox_message_unpack(tarantoolbox_message_t *message) {
     if (message->response.error == ERR_CODE_OK) {
         tarantoolbox_affected_unpack(message, data, size);
     } else if (size > 0) {
-        message->response.error_string = data;
+        if (((char *)data)[size - 1] == '\0') {
+            message->response.error_string = data;
+        } else {
+            message->response.error_string = malloc(size + 1);
+            memcpy(message->response.error_string, data, size);
+            message->response.error_string[size] = '\0';
+            message->response.error_string_allocated = true;
+        }
     }
     message->response.unpacked = true;
 }
