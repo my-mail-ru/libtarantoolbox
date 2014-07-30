@@ -83,8 +83,8 @@ static void tarantoolbox_affected_unpack(tarantoolbox_message_t *message, void *
 void tarantoolbox_message_unpack(tarantoolbox_message_t *message) {
     if (message->response.unpacked) return;
     message->response.error = iproto_message_error(message->message);
-    message->response.error_string = iproto_error_string(message->response.error);
     if (message->response.error != ERR_CODE_OK) {
+        message->response.error_string = iproto_error_string(message->response.error);
         message->response.unpacked = true;
         return;
     }
@@ -93,6 +93,7 @@ void tarantoolbox_message_unpack(tarantoolbox_message_t *message) {
     if (size < sizeof(tarantoolbox_message_response_pack_t)) {
         tarantoolbox_log(LOG_ERROR, "response is too short to contain error code");
         message->response.error = ERR_CODE_INVALID_RESPONSE;
+        message->response.error_string = tarantoolbox_error_string(message->response.error);
         message->response.unpacked = true;
         return;
     }
@@ -102,6 +103,7 @@ void tarantoolbox_message_unpack(tarantoolbox_message_t *message) {
     size -= sizeof(tarantoolbox_message_response_pack_t);
     if (message->response.error == ERR_CODE_OK) {
         tarantoolbox_affected_unpack(message, data, size);
+        message->response.error_string = tarantoolbox_error_string(message->response.error);
     } else if (size > 0) {
         if (((char *)data)[size - 1] == '\0') {
             message->response.error_string = data;
@@ -111,6 +113,8 @@ void tarantoolbox_message_unpack(tarantoolbox_message_t *message) {
             message->response.error_string[size] = '\0';
             message->response.error_string_allocated = true;
         }
+    } else {
+        message->response.error_string = tarantoolbox_error_string(message->response.error);
     }
     message->response.unpacked = true;
 }

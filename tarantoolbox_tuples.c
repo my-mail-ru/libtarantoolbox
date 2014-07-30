@@ -42,7 +42,7 @@ uint32_t tarantoolbox_tuples_get_count(tarantoolbox_tuples_t *tuples) {
 void tarantoolbox_tuples_set_tuple(tarantoolbox_tuples_t *tuples, uint32_t id, tarantoolbox_tuple_t *tuple) {
     assert(id < tuples->count && tuples->tuples);
     if (tuples->tuples[id])
-        free(tuples->tuples[id]);
+        tarantoolbox_tuple_free(tuples->tuples[id]);
     tuples->tuples[id] = tuple;
 }
 
@@ -82,7 +82,7 @@ tarantoolbox_tuples_t *tarantoolbox_tuples_unpack(void *data, size_t size, size_
         tarantoolbox_tuple_t *tuple = tarantoolbox_tuple_unpack(data, size, &tsize);
         if (tuple == NULL) {
             tarantoolbox_log(LOG_ERROR, "failed to unpack tuple");
-            free(tuples);
+            tarantoolbox_tuples_free(tuples);
             return NULL;
         }
         tuples->tuples[i] = tuple;
