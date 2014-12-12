@@ -13,7 +13,6 @@ Summary:        tarantool/octopus box C client library
 Group:          Development/Libraries
 License:        BSD
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-buildroot
-BuildRequires:  git
 BuildRequires:  gcc cmake
 BuildRequires:  libiprotocluster-devel >= %{__libiprotoclusterdevel_version}
 BuildRequires:  libiprotocluster >= %{__libiprotocluster_version}
