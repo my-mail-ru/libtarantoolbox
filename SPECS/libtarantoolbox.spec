@@ -1,7 +1,5 @@
 %bcond_with static
 
-%define _prefix /usr/local
-
 %define __libiprotocluster_version 20130905.1741
 %define __libiprotoclusterdevel_version 20130905.1741
 
@@ -31,10 +29,6 @@ make %{?_smp_mflags}
 %install
 rm -rf $RPM_BUILD_ROOT
 make install DESTDIR=$RPM_BUILD_ROOT
-%if ! %{with static}
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/ld.so.conf.d
-echo "%{_libdir}" > $RPM_BUILD_ROOT%{_sysconfdir}/ld.so.conf.d/%{name}.conf
-%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -46,7 +40,6 @@ rm -rf $RPM_BUILD_ROOT
 %if ! %{with static}
 %files
 %{_libdir}/*.so
-%{_sysconfdir}/ld.so.conf.d/%{name}.conf
 %endif
 
 %package devel
