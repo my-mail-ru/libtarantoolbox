@@ -53,7 +53,7 @@ void tarantoolbox_message_free(tarantoolbox_message_t *message) {
     if (message->response.tuples)
         tarantoolbox_tuples_free(message->response.tuples);
     if (message->response.error_string_allocated)
-        free(message->response.error_string);
+        free((char *)message->response.error_string);
     free(message->data);
     free(message);
 }
@@ -108,9 +108,10 @@ void tarantoolbox_message_unpack(tarantoolbox_message_t *message) {
         if (((char *)data)[size - 1] == '\0') {
             message->response.error_string = data;
         } else {
-            message->response.error_string = malloc(size + 1);
-            memcpy(message->response.error_string, data, size);
-            message->response.error_string[size] = '\0';
+            char *error_string = malloc(size + 1);
+            memcpy(error_string, data, size);
+            error_string[size] = '\0';
+            message->response.error_string = error_string;
             message->response.error_string_allocated = true;
         }
     } else {
@@ -119,7 +120,7 @@ void tarantoolbox_message_unpack(tarantoolbox_message_t *message) {
     message->response.unpacked = true;
 }
 
-tarantoolbox_error_t tarantoolbox_message_error(tarantoolbox_message_t *message, char **error_string) {
+tarantoolbox_error_t tarantoolbox_message_error(tarantoolbox_message_t *message, const char **error_string) {
     tarantoolbox_message_unpack(message);
     if (error_string)
         *error_string = message->response.error_string;

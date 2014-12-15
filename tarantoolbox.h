@@ -73,7 +73,7 @@ tarantoolbox_message_t *tarantoolbox_call_init(const char *function, tarantoolbo
 void tarantoolbox_message_free(tarantoolbox_message_t *message);
 iproto_message_t *tarantoolbox_message_get_iproto_message(tarantoolbox_message_t *message);
 tarantoolbox_message_type_t tarantoolbox_message_type(tarantoolbox_message_t *message);
-tarantoolbox_error_t tarantoolbox_message_error(tarantoolbox_message_t *message, char **error_string);
+tarantoolbox_error_t tarantoolbox_message_error(tarantoolbox_message_t *message, const char **error_string);
 tarantoolbox_tuples_t *tarantoolbox_message_response(tarantoolbox_message_t *message, bool *replica);
 
 tarantoolbox_update_ops_t *tarantoolbox_update_ops_init(uint32_t extend_count);

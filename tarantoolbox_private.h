@@ -13,7 +13,7 @@ struct tarantoolbox_message {
         bool unpacked;
         bool replica;
         uint32_t error;
-        char *error_string;
+        const char *error_string;
         bool error_string_allocated;
         tarantoolbox_tuples_t *tuples;
     } response;
