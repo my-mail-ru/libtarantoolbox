@@ -20,11 +20,34 @@ tarantoolbox_message_t *tarantoolbox_message_init(tarantoolbox_message_type_t ty
     tarantoolbox_message_t *message = malloc(sizeof(*message));
     memset(message, 0, sizeof(*message));
     message->type = type;
-    message->response.error = ERR_CODE_REQUEST_IN_PROGRESS;
-    message->message = iproto_message_init(type, data, size);
     message->data = data;
+    message->size = size;
+    message->response.error = ERR_CODE_REQUEST_IN_PROGRESS;
+    return message;
+}
+
+void tarantoolbox_message_free(tarantoolbox_message_t *message) {
+    if (message->message)
+        iproto_message_free(message->message);
+    if (message->response.tuples)
+        tarantoolbox_tuples_free(message->response.tuples);
+    if (message->response.error_string_allocated)
+        free((char *)message->response.error_string);
+    free(message->data);
+    free(message);
+}
+
+void tarantoolbox_message_set_microshard(tarantoolbox_message_t *message, uint16_t microshard_num) {
+    assert(message->message == NULL);
+    message->microshard_num = microshard_num;
+}
+
+static void tarantoolbox_message_init_iproto_message(tarantoolbox_message_t *message) {
+    tarantoolbox_message_type_t type = message->type;
+    uint32_t code = (message->microshard_num << 16) | type;
+    message->message = iproto_message_init(code, message->data, message->size);
     iproto_message_opts_t *opts = iproto_message_options(message->message);
-    opts->from = type == SELECT || type == EXEC_LUA ? FROM_MASTER_REPLICA : FROM_MASTER;
+    opts->from = type == SELECT ? FROM_MASTER_REPLICA : FROM_MASTER;
     if (type == UPDATE_FIELDS) {
         opts->retry |= RETRY_SAFE;
     } else {
@@ -45,20 +68,11 @@ tarantoolbox_message_t *tarantoolbox_message_init(tarantoolbox_message_type_t ty
         opts->soft_retry_delay_max.tv_usec = 500000;
     }
     opts->soft_retry_callback = tarantoolbox_message_soft_retry_callback;
-    return message;
-}
-
-void tarantoolbox_message_free(tarantoolbox_message_t *message) {
-    iproto_message_free(message->message);
-    if (message->response.tuples)
-        tarantoolbox_tuples_free(message->response.tuples);
-    if (message->response.error_string_allocated)
-        free((char *)message->response.error_string);
-    free(message->data);
-    free(message);
 }
 
 iproto_message_t *tarantoolbox_message_get_iproto_message(tarantoolbox_message_t *message) {
+    if (!message->message)
+        tarantoolbox_message_init_iproto_message(message);
     return message->message;
 }
 
@@ -82,6 +96,7 @@ static void tarantoolbox_affected_unpack(tarantoolbox_message_t *message, void *
 
 void tarantoolbox_message_unpack(tarantoolbox_message_t *message) {
     if (message->response.unpacked) return;
+    assert(message->message != NULL);
     message->response.error = iproto_message_error(message->message);
     if (message->response.error != ERR_CODE_OK) {
         message->response.error_string = iproto_error_string(message->response.error);

@@ -5,8 +5,10 @@
 #include <iproto_util.h>
 
 struct tarantoolbox_message {
+    uint16_t microshard_num;
     tarantoolbox_message_type_t type;
     void *data;
+    size_t size;
     iproto_message_t *message;
     bool want_result;
     struct {
