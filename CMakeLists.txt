@@ -2,6 +2,15 @@ cmake_minimum_required(VERSION 2.6)
 
 project(tarantoolbox)
 
+option(BUILD_SHARED_LIBS "Build shared libraries" ON)
+
+include(GNUInstallDirs)
+
+if(DEFINED LIBIPROTOCLUSTER_INSTALL_PREFIX)
+    include_directories("${LIBIPROTOCLUSTER_INSTALL_PREFIX}/${CMAKE_INSTALL_INCLUDEDIR}")
+    link_directories("${LIBIPROTOCLUSTER_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+endif()
+
 set(tarantoolbox_cflags "-std=gnu99 -Wall -Werror -ggdb3")
 
 set(tarantoolbox_sources tarantoolbox.c
@@ -19,7 +28,7 @@ target_link_libraries(tarantoolboxtest tarantoolbox)
 set_target_properties(tarantoolboxtest PROPERTIES COMPILE_FLAGS "${tarantoolbox_cflags}")
 
 install(TARGETS tarantoolbox
-    LIBRARY DESTINATION ${LIB_INSTALL_DIR}
-    ARCHIVE DESTINATION ${LIB_INSTALL_DIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
-install(FILES tarantoolbox.h DESTINATION include)
+install(FILES tarantoolbox.h DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
